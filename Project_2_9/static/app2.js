@@ -1,37 +1,47 @@
-
+// d3.queue is a JS library that works with multiple asynchronious functions
 d3.queue()
+//makes 2 requests for topojson file and emissions_data.csv
   .defer(d3.json, "//unpkg.com/world-atlas@1.1.4/world/50m.json")
-  .defer(d3.csv, "./data/final_data/emissions_dashboard_data_final.csv", function(row) {
+  .defer(d3.json, "/meat_data/", function(row) {
     return {
       continent: row.Continent,
       country: row.Country,
-      countryCode: row["Country Code"],
-      emissions: +row["Emissions"],
-      emissionsPerCapita: +row["Emissions Per Capita"],
+      countryCode: row.CountryCode,
+      consumption: +row.TotalBeefConsumption,
+      consumptionPerCapita: +row.BeefConsumptionPerCapita,
       region: row.Region,
       year: +row.Year
     }
   })
+// await to make sure fetch of all data is complete
   .await(function(error, mapData, data) {
-    if (error) throw error;
-
+  //  if (error) throw error;
+//set variable for max and min year values
     var extremeYears = d3.extent(data, d => d.year);
     var currentYear = extremeYears[0];
+//assign a variable for html radio button that allows to choose only 1 of predefined mutually exclusive options
     var currentDataType = d3.select('input[name="data-type"]:checked')
                             .attr("value");
+//geoData variable assigned to converted topojson file
     var geoData = topojson.feature(mapData, mapData.objects.countries).features;
-
+//setting svg width as wide as the chart-container
     var width = +d3.select(".chart-container")
                    .node().offsetWidth;
     var height = 300;
-
+// Create functions createMap, createPie, createBar with appropriate width and height
     createMap(width, width * 4 / 5);
     createPie(width, height);
     createBar(width, height);
+//Create drawMap function that takes in topojson data,emissions data, currentYear,currentDataType
+//Create drawPie function that takes emissions data and currentYear
+//Create drawBar function that takes in emissions data,currentDataType, and empty string for country
     drawMap(geoData, data, currentYear, currentDataType);
     drawPie(data, currentYear);
     drawBar(data, currentDataType, "");
 
+//Select range input with id='year'
+//Add an event-listener,when values changecd for the currentYear, 
+//grabs new data and redraws the map,pie chart and highlightBars for current year
     d3.select("#year")
         .property("min", currentYear)
         .property("max", extremeYears[1])
@@ -42,7 +52,9 @@ d3.queue()
           drawPie(data, currentYear);
           highlightBars(currentYear);
         });
-
+//Select input with name attribute 'data-type'
+//Add an event-listener,when value changes for the currentDataType,grabs new data and redraws the map
+//update bar chart,checks if there is an active country and calls drawBar with appropriate values
     d3.selectAll('input[name="data-type"]')
         .on("change", () => {
           var active = d3.select(".active").data()[0];
@@ -54,7 +66,7 @@ d3.queue()
 
     d3.selectAll("svg")
         .on("mousemove touchmove", updateTooltip);
-
+//Initiliaze updateToolTip function
     function updateTooltip() {
       var tooltip = d3.select(".tooltip");
       var tgt = d3.select(d3.event.target);
@@ -90,11 +102,12 @@ d3.queue()
       }
     }
   });
-
+//Create helper function to convert keys from camelcase string, add space and change to Uppercase letters.
 function formatDataType(key) {
   return key[0].toUpperCase() + key.slice(1).replace(/[A-Z]/g, c => " " + c);
 }
-
+//Create helper function getPercentage that calculates the difference between 2 angles multiplied by 100
+//and divided by PI to get a number between 0 and 100
 function getPercentage(d) {
   var angle = d.endAngle - d.startAngle;
   var fraction = 100 * angle / (Math.PI * 2);

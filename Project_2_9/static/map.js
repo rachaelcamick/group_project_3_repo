@@ -1,3 +1,4 @@
+//Create function createMap, select #map and append attributes
 function createMap(width, height) {
   d3.select("#map")
       .attr("width", width)
@@ -12,19 +13,24 @@ function createMap(width, height) {
 
 function drawMap(geoData, climateData, year, dataType) {
   var map = d3.select("#map");
-
+ //projection function transforms spherical polygonal geometry to planar polygonal geometry
+// geoMercator spherical Mercator projection scale and translate it based on svg
   var projection = d3.geoMercator()
                      .scale(110)
                      .translate([
                        +map.attr("width") / 2,
                        +map.attr("height") / 1.4
                      ]);
-
+// create new geographic path generator
   var path = d3.geoPath()
                .projection(projection);
-
+  
+//grabs 'year-val' id to update text to currentYear
   d3.select("#year-val").text(year);
 
+//join climateData to geography. Filter country codes to match data ids.
+//create variable to refer to country
+//d.property keys equal to climatedata if it exists, or simple object if it doesn't
   geoData.forEach(d => {
     var countries = climateData.filter(row => row.countryCode === d.id);
     var name = '';
@@ -36,7 +42,7 @@ function drawMap(geoData, climateData, year, dataType) {
 
   var domains = {
     emissions: [0, 2.5e5, 1e6, 5e6],
-    emissionsPerCapita: [0, 0.5, 2, 10]
+    emissionsPerCapita: [0.001, 0.002, 0.003, 0.005]
   };
 
   var mapColorScale = d3.scaleLinear()
@@ -45,7 +51,7 @@ function drawMap(geoData, climateData, year, dataType) {
 
   var update = map.selectAll(".country")
                   .data(geoData);
-
+//update pattern, merge binds exisiting data elements to new data
   update
     .enter()
     .append("path")
@@ -69,11 +75,12 @@ function drawMap(geoData, climateData, year, dataType) {
         var val = d.properties[dataType];
         return val ? mapColorScale(val) : "#ccc";
       });
-
+  //select map-title and change the title
   d3.select(".map-title")
-      .text("Carbon dioxide " + graphTitle(dataType) + ", " + year);
+      .text("Methane " + graphTitle(dataType) + ", " + year);
 }
 
+// helper function that converts keys from camelcase string, adds space and changes to lowercase
 function graphTitle(str) {
   return str.replace(/[A-Z]/g, c => " " + c.toLowerCase());
 }

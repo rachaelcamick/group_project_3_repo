@@ -1,3 +1,5 @@
+
+//Create function createBar and append x and y axis,text
 function createBar(width, height) {
   var bar = d3.select("#bar")
                   .attr("width", width)
@@ -24,13 +26,13 @@ function createBar(width, height) {
       .style("text-anchor", "middle")
       .classed("bar-title", true);
 }
-
+// create function highlightBars grabs all rectangles and updates "fill" based on current year
 function highlightBars(year) {
   d3.select("#bar")
     .selectAll("rect")
       .attr("fill", d => d.year === year ? "#16a085" : "#1abc9c");
 }
-
+// Create function drawBar
 function drawBar(data, dataType, country) {
   var bar = d3.select("#bar");
   var padding = {
@@ -71,11 +73,11 @@ function drawBar(data, dataType, country) {
       .call(yAxis);
 
   var axisLabel = dataType === "emissions" ?
-    "CO2 emissions, thousand metric tons" :
-    "CO2 emissions, metric tons per capita";
+    "CH4 emissions, thousand metric tons" :
+    "CH4 emissions, metric tons per capita";
 
   var barTitle = country ?
-    "CO2 Emissions, " + country :
+    "CH4 Emissions, " + country :
     "Click on a country to see annual trends.";
 
   d3.select(".y-axis-label")
@@ -83,7 +85,8 @@ function drawBar(data, dataType, country) {
 
   d3.select(".bar-title")
       .text(barTitle);
-
+  
+// create variable for transition with easeBounceOut
   var t = d3.transition()
             .duration(1000)
             .ease(d3.easeBounceOut);
@@ -99,7 +102,8 @@ function drawBar(data, dataType, country) {
       .attr("y", height - padding.bottom)
       .attr("height", 0)
       .remove();
-
+  
+//Add rectangles merge/bind new data
   update
     .enter()
     .append("rect")

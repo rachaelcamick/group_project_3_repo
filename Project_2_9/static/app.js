@@ -66,7 +66,7 @@ d3.queue()
 
     d3.selectAll("svg")
         .on("mousemove touchmove", updateTooltip);
-//Initiliaze updateToolTip function
+//Initilize updateToolTip function
     function updateTooltip() {
       var tooltip = d3.select(".tooltip");
       var tgt = d3.select(d3.event.target);

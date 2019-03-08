@@ -48,7 +48,7 @@ class Beef(db.Model):
 @app.route("/")
 def index():
      """Return the homepage."""
-     return render_template("templates/index.html")
+     return render_template("index.html")
 def welcome():
 
     """List all available api routes."""
@@ -66,7 +66,7 @@ def welcome():
 @app.route("/beef")
 def index2():
      """Return page."""
-     return render_template("templates/index2v2.html")
+     return render_template("index2v2.html")
 
 @app.route("/emissions_data/")
 
